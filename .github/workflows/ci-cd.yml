@@ -1,0 +1,95 @@
+name: CI / CD
+
+# Trigger on every push to any branch.
+# The deploy job only runs when the push is to 'master'.
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["master"]
+
+# ---------------------------------------------------------------------------
+# Job 1 — Continuous Integration (run unit tests)
+# ---------------------------------------------------------------------------
+jobs:
+  test:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies (including dev)
+        run: uv sync --frozen
+
+      - name: Run pytest
+        run: uv run pytest tests/ -v
+
+# ---------------------------------------------------------------------------
+# Job 2 — Continuous Deployment (build & push Docker image, then deploy)
+#
+# Only runs when:
+#   • the tests job passes, AND
+#   • the push is to the 'master' branch
+#
+# Required repository secrets (Settings → Secrets → Actions):
+#   DOCKER_USERNAME  — your Docker Hub username
+#   DOCKER_PASSWORD  — your Docker Hub access token
+#   DEPLOY_HOST      — hostname / IP of the university ML server
+#   DEPLOY_USER      — SSH user on that server
+#   DEPLOY_SSH_KEY   — private SSH key (the server must have the public key)
+# ---------------------------------------------------------------------------
+  deploy:
+    name: Build, push & deploy
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---- Docker Hub login & build ----------------------------------------
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # Image name: <dockerhub-user>/a3:latest  (also tag with SHA for traceability)
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/a3:latest
+            ${{ secrets.DOCKER_USERNAME }}/a3:${{ github.sha }}
+
+      # ---- SSH into the university ML server and redeploy ------------------
+      - name: Deploy to university ML server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            # Pull the freshly-built image
+            docker pull ${{ secrets.DOCKER_USERNAME }}/a3:latest
+
+            # Restart using the project docker-compose.yaml
+            # Adjust the path below to wherever you keep your compose file on the server
+            cd ~/a3
+            docker compose pull
+            docker compose up -d --remove-orphans

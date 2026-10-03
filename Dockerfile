@@ -13,13 +13,13 @@ RUN uv sync --frozen --no-dev
 COPY app ./app
 COPY model ./model
 
-# The FastAPI app lives in app/main.py
-WORKDIR /code/app
-
 # Place the virtualenv on PATH so uvicorn runs directly without uv needing network at startup
 ENV PATH="/code/.venv/bin:$PATH"
 
+WORKDIR /code
+
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
 

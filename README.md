@@ -92,5 +92,5 @@ Then open http://localhost:8000
 
 ## CI / CD Pipeline
 
-- **Continuous Integration (CI)**: Runs `pytest tests/ -v` on every push and pull request.
-- **Continuous Deployment (CD)**: Automatically builds and pushes the Docker container to Docker Hub, then triggers server redeployment when changes are merged into the main branch.
+- **Continuous Integration (CI)**: Runs `pytest tests/ -v` on every push and pull request to verify model and API behavior.
+- **Continuous Deployment (CD)**: Automatically builds and pushes the Docker image (`ntpntpntp/carprice-app-a3:latest`) to Docker Hub whenever changes are merged into the `main` branch.

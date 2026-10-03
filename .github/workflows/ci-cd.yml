@@ -27,7 +27,7 @@ jobs:
       - run: uv run pytest tests/ -v
 
   deploy:
-    name: Build, push & deploy
+    name: Build & push Docker image
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -48,16 +48,3 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/carprice-app-a3:latest
             ${{ secrets.DOCKER_USERNAME }}/carprice-app-a3:${{ github.sha }}
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          password: ${{ secrets.DEPLOY_PASSWORD }}
-          proxy_host: ${{ secrets.PROXY_HOST }}
-          proxy_username: ${{ secrets.DEPLOY_USER }}
-          proxy_password: ${{ secrets.DEPLOY_PASSWORD }}
-          script: |
-            cd ~/carprice-a3
-            docker compose pull
-            docker compose up -d --remove-orphans

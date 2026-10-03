@@ -15,6 +15,8 @@ Web application that classifies used cars into **4 price tiers** based on **manu
 - **MLflow Registry & pyfunc Wrapper**: Model registered with embedded scaler and class name lookup.
 - **Automated Testing & CI/CD**: Pytest unit tests for input/output verification executed automatically via GitHub Actions upon every push.
 
+> **Note (Objectives 1 & 2 — MLflow Experiment Logging):** MLflow experiment tracking and model registration are run **locally** (same approach as A2). All training runs, hyperparameter logs, and the registered model are captured via `mlflow` in [`experiments.ipynb`](experiments.ipynb). The local tracking URI is `sqlite:///mlflow.db` (created automatically when the notebook is executed).
+
 ---
 
 ## Tech Stack

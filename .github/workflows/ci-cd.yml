@@ -53,11 +53,9 @@ jobs:
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
           password: ${{ secrets.DEPLOY_PASSWORD }}
           proxy_host: ${{ secrets.PROXY_HOST }}
           proxy_username: ${{ secrets.DEPLOY_USER }}
-          proxy_key: ${{ secrets.DEPLOY_SSH_KEY }}
           proxy_password: ${{ secrets.DEPLOY_PASSWORD }}
           script: |
             cd ~/carprice-a3

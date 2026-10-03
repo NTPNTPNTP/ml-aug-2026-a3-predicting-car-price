@@ -26,7 +26,7 @@ from typing import Optional
 # Re-register the custom classes under __main__ so mlflow's internal joblib
 # unpickling (skops) can resolve them when loading from the registry.
 # ---------------------------------------------------------------------------
-import model_classes  # noqa: E402
+from . import model_classes
 
 _main = sys.modules.setdefault("__main__", types.ModuleType("__main__"))
 _main.LogisticRegression = model_classes.LogisticRegression

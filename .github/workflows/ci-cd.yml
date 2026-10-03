@@ -60,6 +60,6 @@ jobs:
           proxy_key: ${{ secrets.DEPLOY_SSH_KEY }}
           proxy_password: ${{ secrets.DEPLOY_PASSWORD }}
           script: |
-            cd ~/a3
+            cd ~/carprice-a3
             docker compose pull
             docker compose up -d --remove-orphans

@@ -45,8 +45,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/a3:latest
-            ${{ secrets.DOCKER_USERNAME }}/a3:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/carprice-app-a3:latest
+            ${{ secrets.DOCKER_USERNAME }}/carprice-app-a3:${{ github.sha }}
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
